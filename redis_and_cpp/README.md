@@ -68,6 +68,26 @@ Run the program with the following command:
 ./program
 ```
 
+## Visualizing Redis
+
+Redis run by default at port 6379 when PC starts. To view Redis data in a browser, you would need a Redis GUI client that provides a web interface. One such tool is "Redis Commander". Here's how you can set it up:
+
+1. Install Redis Commander globally via npm:
+
+```bash
+sudo npm install -g redis-commander
+```
+
+2. Run Redis Commander:
+
+```bash
+redis-commander
+```
+
+By default, Redis Commander runs on `localhost:8081`. Open this URL in your browser to view and manage your Redis data.
+
+Please note that Redis Commander and similar tools should be used carefully and never in a production environment, as they can potentially expose sensitive data
+
 ## Troubleshooting
 
 If you encounter a "Connection refused" error, make sure that the Redis server is running and listening on the correct host and port.

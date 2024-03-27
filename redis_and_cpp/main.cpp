@@ -14,11 +14,11 @@ int main() {
     }
 
     // Write data to Redis
-    redisReply* reply = (redisReply*)redisCommand(c, "SET %s %s", "key", "value");
+    redisReply* reply = (redisReply*)redisCommand(c, "SET %s %s", "name", "komal");
     freeReplyObject(reply);
 
     // Read data from Redis
-    reply = (redisReply*)redisCommand(c, "GET %s", "key");
+    reply = (redisReply*)redisCommand(c, "GET %s", "name");
     if (reply->type == REDIS_REPLY_STRING) {
         std::cout << "Got value: " << reply->str << std::endl;
     }
