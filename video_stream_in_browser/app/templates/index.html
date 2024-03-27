@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      img {
+        width: 60%;
+        height: auto;
+      }
+      #button {
+        background-color: green;
+        color: white; /* Make the text color white so it's readable on a green background */
+        font-size: 20px; /* Adjust as needed */
+        padding: 10px 20px; /* Adjust as needed */
+        border-radius: 5px; /* Adjust as needed */
+      }
+      #textbox {
+        width: 300px; /* Adjust as needed */
+        height: 50px; /* Adjust as needed */
+        font-size: 20px; /* Adjust as needed */
+        font-weight: bold;
+      }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        setInterval(function () {
+          $("img").attr("src", "/static/img.jpg?" + new Date().getTime());
+        }, 1000);
+      });
+    </script>
+  </head>
+  <body>
+    <img src="{{ image_url }}" alt="Image" />
+    <button id="button">Click me</button>
+    <input type="text" id="textbox" readonly />
+    <script>
+      document.getElementById("button").addEventListener("click", function () {
+        fetch("/button")
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            document.getElementById("textbox").value = data.message;
+          });
+      });
+    </script>
+  </body>
+</html>
