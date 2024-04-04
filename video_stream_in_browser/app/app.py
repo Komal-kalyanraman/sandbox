@@ -29,6 +29,11 @@ def button_click():
     random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
     return jsonify({'message': random_string})
 
+@app.route('/aws', methods=['POST'])
+def request_from_aws():
+    print("Request from AWS received")
+    return jsonify({'message': 'You reached me successfully!'})
+
 if __name__ == "__main__":
     video_thread = threading.Thread(target=process_video)
     video_thread.start()
