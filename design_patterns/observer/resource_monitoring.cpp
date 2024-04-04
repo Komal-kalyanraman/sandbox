@@ -155,11 +155,12 @@ public:
                 cout << "Average Memory Utilization: " << avg_memoryUtilization << "%" << endl;
             }
         }
+        notifyObservers();
     }
 };
 
-// PodManager acts as the Observer
-class PodManager : public Observer {
+// DeletePod acts as the Observer
+class DeletePod : public Observer {
 public:
     void update(float avg_cpuUtilization, float avg_memoryUtilization) override {
         // Logic to check if the resource utilization is high
@@ -167,46 +168,20 @@ public:
             cout << "CPU utilization is high" << endl;
             is_cpu_utilization_high = true;
         } else{
+            cout<< "NONE" << endl;
             is_cpu_utilization_high = false;
-        }
-
-        if(avg_cpuUtilization < pod_respawn_cpu_threshold){
-            cout << "CPU utilization is below threshold" << endl;
-            is_cpu_utilization_below_pod_respawn_threshold = true;
-        } else{
-            is_cpu_utilization_below_pod_respawn_threshold = false;
         }
 
         if(avg_memoryUtilization >= memory_utilization_threshold){
             cout << "Memory utilization is high" << endl;
             is_memory_utilization_high = true;
         } else{
+            cout<< "NONE" << endl;
             is_memory_utilization_high = false;
         }
 
-        if(avg_memoryUtilization < pod_respawn_memory_threshold){
-            cout << "Memory utilization is below threshold" << endl;
-            is_memory_utilization_below_pod_respawn_threshold = true;
-        } else{
-            is_memory_utilization_below_pod_respawn_threshold = false;
-        }
-
         // Check if CPU and Memory utilization is below threshold
-        if(!(is_cpu_utilization_high or is_memory_utilization_high)){
-            // Check if pod is already running
-            if(is_memory_utilization_below_pod_respawn_threshold and is_cpu_utilization_below_pod_respawn_threshold) {
-                respawn_counter++;
-                if(respawn_counter >= 10) {
-                    spawnPod();    // Apply QM pod
-                    string msg = "Spawnning QM pod as CPU and Memory utilization is below threshold";
-                    cout << msg << endl;
-                    respawn_counter = 0;
-                }
-            } else {
-                respawn_counter = 0;
-            }
-        }
-        else{
+        if(is_cpu_utilization_high or is_memory_utilization_high){
             string msg = "Resource utilization is above threshold limit";
             deletePod();    // Delete QM pod
 
@@ -219,26 +194,69 @@ public:
         }
     }
 
-    void spawnPod() {
-        cout<< "Pod has been successfully spawned" << endl;
-        // Logic to spawn a new pod
-    }
-
     void deletePod() {
         cout<< "Pod has been successfully deleted" << endl;
         // Logic to delete a pod
     }
 };
 
+// Spawn acts as the Observer
+class RespawnPod : public Observer {
+public:
+    void update(float avg_cpuUtilization, float avg_memoryUtilization) override {
+        // Logic to check if the resource utilization is high
+        if(avg_cpuUtilization < pod_respawn_cpu_threshold){
+            cout << "CPU utilization is below threshold" << endl;
+            is_cpu_utilization_below_pod_respawn_threshold = true;
+        } else{
+            cout<< "NONE" << endl;
+            is_cpu_utilization_below_pod_respawn_threshold = false;
+        }
+
+        if(avg_memoryUtilization < pod_respawn_memory_threshold){
+            cout << "Memory utilization is below threshold" << endl;
+            is_memory_utilization_below_pod_respawn_threshold = true;
+        } else{
+            cout<< "NONE" << endl;
+            is_memory_utilization_below_pod_respawn_threshold = false;
+        }
+
+        // Check if CPU and Memory utilization is below threshold
+        if(!(is_cpu_utilization_high or is_memory_utilization_high)){
+            // Check if pod is already running
+            if(is_memory_utilization_below_pod_respawn_threshold and is_cpu_utilization_below_pod_respawn_threshold) {
+                respawn_counter++;
+                if(respawn_counter >= 10) {
+                    respawnPod();    // Apply QM pod
+                    string msg = "Spawnning QM pod as CPU and Memory utilization is below threshold";
+                    cout << msg << endl;
+                    respawn_counter = 0;
+                }
+            } else {
+                respawn_counter = 0;
+            }
+        }
+    }
+
+    void respawnPod() {
+        cout<< "Pod has been successfully respawned" << endl;
+        // Logic to spawn a new pod
+    }
+};
+
 int main() {
     ResourceMonitorHandler resourceMonitor;
-    PodManager podManager;
+    DeletePod deletePod;
+    RespawnPod respawnPod;
 
-    // Add PodManager as an observer to ResourceMonitorHandler
-    resourceMonitor.addObserver(&podManager);
+    // Add Deletepod, RespawnPod as an observer to ResourceMonitorHandler
+    resourceMonitor.addObserver(&deletePod);
+    resourceMonitor.addObserver(&respawnPod);
 
-    // Start monitoring resources
+    // while(true){
+        // Start monitoring resources
     resourceMonitor.averageResourceUtilization();
+    // }    
 
     return 0;
 }
