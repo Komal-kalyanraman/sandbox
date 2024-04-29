@@ -19,7 +19,7 @@ public:
 
 int main() {
     mosqpp::lib_init();
-    MySubscriber subscriber("subscriber", "test/topic");
+    MySubscriber subscriber("subscriber", "resource/cpu_usage");
 
     // Keep the main function from exiting immediately
     while(true) {

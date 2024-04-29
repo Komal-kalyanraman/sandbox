@@ -26,7 +26,7 @@ public:
 int main() {
     mosqpp::lib_init();
     MyPublisher publisher("publisher");
-    publisher.start("test/topic");
+    publisher.start("resource/cpu_usage");
 
     // Keep the main function from exiting immediately
     while(true) {

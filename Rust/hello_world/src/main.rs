@@ -1,6 +1,8 @@
 use std::thread;
 use std::time::Duration;
+use tokio::runtime::Runtime;
 use sysinfo::{ProcessorExt, System, SystemExt};
+use rumqttc::{MqttOptions, Client, QoS};
 
 fn cpu_utilization_and_memory() {
     let mut system = System::new_all();
@@ -23,6 +25,20 @@ fn cpu_utilization_and_memory() {
 
     println!("Average CPU usage: {}%", average_cpu_usage);
     println!("Memory usage: {}%", memory_usage);
+
+    // Create a new MQTT client
+    let mut mqttoptions = MqttOptions::new("publisher", "localhost", 1883);
+    mqttoptions.set_keep_alive(60);
+    let (mut client, _conn) = Client::new(mqttoptions, 10);
+
+    // Publish the CPU and memory usage data
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+        tokio::spawn(async move {
+            client.publish("resource/cpu_usage", QoS::AtLeastOnce, false, average_cpu_usage).unwrap();
+            client.publish("resource/memory_usage", QoS::AtLeastOnce, false, memory_usage).unwrap();
+        }).await.unwrap();
+    });
 }
 
 fn main() {
