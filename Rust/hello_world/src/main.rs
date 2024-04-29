@@ -24,7 +24,9 @@ fn cpu_utilization_and_memory(client: Arc<Mutex<Client>>) {
     // Get total and free memory
     let total_memory = system.total_memory();
     let free_memory = system.available_memory();
-    let memory_usage = format!("{:.2}", ((total_memory as f32 - free_memory as f32)/total_memory as f32)* 100.0);
+    let memory_usage: i32 = (((total_memory as f32 - free_memory as f32)/total_memory as f32)* 100.0) as i32;
+    let memory_usage_string = memory_usage.to_string();
+    let memory_usage_bytes = memory_usage_string.into_bytes();
 
     println!("Average CPU usage: {}%", average_cpu_usage);
     println!("Memory usage: {}%", memory_usage);
@@ -36,6 +38,7 @@ fn cpu_utilization_and_memory(client: Arc<Mutex<Client>>) {
         tokio::spawn(async move {
             let mut client = client.lock().unwrap();
             client.publish("resource/cpu_usage", QoS::AtLeastOnce, false, average_cpu_usage_bytes).unwrap();
+            client.publish("resource/memory_usage", QoS::AtLeastOnce, false, memory_usage_bytes).unwrap();
         }).await.unwrap();
     });
 }
