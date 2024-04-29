@@ -5,13 +5,13 @@ use tokio::runtime::Runtime;
 use sysinfo::{ProcessorExt, System, SystemExt};
 use rumqttc::{MqttOptions, Client, QoS};
 
-fn cpu_utilization_and_memory(client: Arc<Mutex<Client>>) {
-    let mut system = System::new_all();
-    let mut cpu_utilization_values = Vec::new();
-
-    // We sleep 20ms to get the CPU usage.
-    thread::sleep(Duration::from_millis(20));
-    system.refresh_all();
+fn cpu_utilization_and_memory(client: Arc<Mutex<Client>>, system: &mut System, cpu_utilization_values: &mut Vec<f32>) {
+    // Clear the CPU utilization values
+    cpu_utilization_values.clear();
+    
+    // Refresh the CPU and memory data
+    system.refresh_cpu();
+    system.refresh_memory();
 
     for (_core, processor) in system.processors().iter().enumerate() {
         cpu_utilization_values.push(processor.cpu_usage());
@@ -61,7 +61,12 @@ fn main() {
         }
     });
 
+    let mut system = System::new_all();
+    let mut cpu_utilization_values = Vec::new();
+
     loop {
-        cpu_utilization_and_memory(Arc::clone(&client));
+        cpu_utilization_and_memory(Arc::clone(&client), &mut system, &mut cpu_utilization_values);
+        // We sleep 100ms to get the CPU usage.
+        thread::sleep(Duration::from_millis(50));
     }
 }
