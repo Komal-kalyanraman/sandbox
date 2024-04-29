@@ -16,7 +16,10 @@ fn cpu_utilization_and_memory() {
         cpu_utilization_values.push(processor.cpu_usage());
     }
     let sum: f32 = cpu_utilization_values.iter().sum();
-    let average_cpu_usage = format!("{:.2}", sum / cpu_utilization_values.len() as f32);
+    // let average_cpu_usage = format!("{:.2}", sum / cpu_utilization_values.len() as f32);
+    let average_cpu_usage = (sum / cpu_utilization_values.len() as f32) as i32;
+    let average_cpu_usage_string = average_cpu_usage.to_string();
+    let average_cpu_usage_bytes = average_cpu_usage_string.into_bytes();
 
     // Get total and free memory
     let total_memory = system.total_memory();
@@ -29,14 +32,26 @@ fn cpu_utilization_and_memory() {
     // Create a new MQTT client
     let mut mqttoptions = MqttOptions::new("publisher", "localhost", 1883);
     mqttoptions.set_keep_alive(60);
-    let (mut client, _conn) = Client::new(mqttoptions, 10);
+
+    let (mut client, mut connection) = Client::new(mqttoptions, 10);
+
+    // Start a new thread to handle network events
+    thread::spawn(move || {
+        for event in connection.iter() {
+            match event {
+                Ok(v) => println!("Event: {:?}", v),
+                Err(e) => println!("Error: {:?}", e),
+            }
+        }
+    });
 
     // Publish the CPU and memory usage data
     let rt = Runtime::new().unwrap();
     rt.block_on(async {
         tokio::spawn(async move {
-            client.publish("resource/cpu_usage", QoS::AtLeastOnce, false, average_cpu_usage).unwrap();
-            client.publish("resource/memory_usage", QoS::AtLeastOnce, false, memory_usage).unwrap();
+            // client.publish("resource/cpu_usage", QoS::AtLeastOnce, false, average_cpu_usage).unwrap();
+            client.publish("resource/cpu_usage", QoS::AtLeastOnce, false, average_cpu_usage_bytes).unwrap();
+            // client.publish("resource/memory_usage", QoS::AtLeastOnce, false, memory_usage).unwrap();
         }).await.unwrap();
     });
 }

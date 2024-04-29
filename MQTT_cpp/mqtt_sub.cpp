@@ -13,7 +13,9 @@ public:
     }
 
     void on_message(const struct mosquitto_message *message) {
-        std::cout << message->topic << " " << static_cast<char*>(message->payload) << "\n";
+        // std::cout << message->topic << " " << static_cast<char*>(message->payload) << "\n";
+        std::string payload(static_cast<char*>(message->payload), message->payloadlen);
+        std::cout << message->topic << " " << payload << "\n";
     }
 };
 
