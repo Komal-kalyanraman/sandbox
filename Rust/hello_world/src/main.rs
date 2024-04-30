@@ -66,7 +66,7 @@ fn main() {
 
     loop {
         cpu_utilization_and_memory(Arc::clone(&client), &mut system, &mut cpu_utilization_values);
-        // We sleep 100ms to get the CPU usage.
+        // We sleep 50ms to get the CPU usage.
         thread::sleep(Duration::from_millis(50));
     }
 }
