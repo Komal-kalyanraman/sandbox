@@ -1,3 +1,5 @@
 Rust/hello_world/target/*
-Rust/resource_monitor/target/*
+!Rust/hello_world/target/.keep
 
+Rust/resource_monitor/target/*
+!Rust/resource_monitor/target/.keep
