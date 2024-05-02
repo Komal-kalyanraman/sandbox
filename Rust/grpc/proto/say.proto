@@ -11,5 +11,5 @@ message SayResponse {
 }
 
 service Say {
-  rpc Send(SayRequest) returns (SayResponse);
+  rpc Send(SayRequest) returns (stream SayResponse);
 }

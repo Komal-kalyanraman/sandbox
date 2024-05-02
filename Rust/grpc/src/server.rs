@@ -1,4 +1,3 @@
-
 pub mod hello {
     tonic::include_proto!("hello");
 }
@@ -6,6 +5,10 @@ pub mod hello {
 use tonic::{transport::Server, Request, Response, Status};
 use crate::hello::say_server::{Say, SayServer};
 use crate::hello::{SayRequest, SayResponse};
+use futures::stream::Stream;
+use std::pin::Pin;
+use tokio::stream::StreamExt;
+use futures::stream::repeat;
 
 // defining a struct for our service
 #[derive(Default)]
@@ -14,13 +17,14 @@ pub struct MySay {}
 // implementing rpc for service defined in .proto
 #[tonic::async_trait]
 impl Say for MySay {
-    // our rpc implemented as function
-    async fn send(&self, request: Request<SayRequest>) -> Result<Response<SayResponse>, Status> {
-        // returning a response as SayResponse message as defined in .proto
-        Ok(Response::new(SayResponse {
-            // reading data from request which is a wrapper around our SayRequest message defined in .proto
-            message: format!("hello {}", request.get_ref().name),
-        }))
+    type SendStream = Pin<Box<dyn Stream<Item = Result<SayResponse, Status>> + Send + Sync + 'static>>;
+
+    async fn send(&self, request: Request<SayRequest>) -> Result<Response<Self::SendStream>, Status> {
+        let message = format!("hello {}", request.get_ref().name);
+
+        let output_stream = repeat(Ok(SayResponse { message: message.clone() }));
+
+        Ok(Response::new(Box::pin(output_stream)))
     }
 }
 
