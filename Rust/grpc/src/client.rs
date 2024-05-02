@@ -1,12 +1,9 @@
-
-// pub mod hello {
-//     tonic::include_proto!("hello");
-// }
+pub mod hello {
+    tonic::include_proto!("hello");
+}
 
 use hello::say_client::SayClient;
 use hello::SayRequest;
-
-mod hello;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
