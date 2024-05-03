@@ -32,25 +32,40 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (mut mqtt_client, mut connection) = Client::new(mqttoptions, 10);
 
     let rt = Runtime::new().unwrap();
-    rt.spawn(async move {
+    let mut connection_handle = rt.spawn(async move {
         for notification in connection.iter() {
             println!("{:?}", notification);
         }
     });
     
     // Loop to continuously print incoming messages
-    while let Some(response) = response_stream.message().await? {
-        println!("CPU Usage: {}", response.cpu_resource);
-        println!("Memory Usage: {}", response.memory_resource);
-        println!("Timestamp: {}", response.timestamp);
-
-        let topic = "cpu_usage";
-        let qos = QoS::AtLeastOnce;
-        let retain = false;
-        let payload = response.cpu_resource.to_string();
-
-        // mqtt_client.publish(topic, qos, retain, payload).unwrap();
+    loop {
+        tokio::select! {
+            response = response_stream.message() => {
+                match response {
+                    Ok(Some(response)) => {
+                        println!("CPU Usage: {}", response.cpu_resource);
+                        println!("Memory Usage: {}", response.memory_resource);
+                        println!("Timestamp: {}", response.timestamp);
+    
+                        let topic = "cpu_usage";
+                        let qos = QoS::AtLeastOnce;
+                        let retain = false;
+                        let payload = response.cpu_resource.to_string();
+    
+                        // mqtt_client.publish(topic, qos, retain, payload).unwrap();
+                    },
+                    _ => break,
+                }
+            }
+            _ = &mut connection_handle => {
+                break;
+            }
+        }
     }
+
+    // Wait for the MQTT connection task to finish
+    connection_handle.await.unwrap();
 
     Ok(())
 }
