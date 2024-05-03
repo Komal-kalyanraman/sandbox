@@ -13,6 +13,7 @@ futures = "0.3"
 rand = "0.8.4"
 chrono = "0.4"
 sysinfo = "0.20.3"
+rumqttc = "0.6.0"
 
 [build-dependencies]
 tonic-build = "0.2.0"
