@@ -2,8 +2,9 @@ pub mod resource_utilization {
     tonic::include_proto!("resource_utilization");
 }
 
-use std::time::Duration;
+use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::Duration;
 use tonic::{transport::Server, Request, Response, Status};
 use resource_utilization::resource_utilization_server::{ResourceUtilization, ResourceUtilizationServer};
 use resource_utilization::{ResourceUtilizationRequest, ResourceUtilizationResponse};
@@ -12,33 +13,48 @@ use std::pin::Pin;
 use sysinfo::{ProcessorExt, System, SystemExt};
 use futures::stream::repeat_with;
 
-// defining a struct for our service
 #[derive(Default)]
-pub struct MyResourceUtilization {}
+pub struct MyResourceUtilization {
+    cpu_usage: Arc<Mutex<u32>>,
+}
 
-// implementing rpc for service defined in .proto
+impl MyResourceUtilization {
+    pub fn new() -> Self {
+        let cpu_usage = Arc::new(Mutex::new(0));
+        let cpu_usage_clone = Arc::clone(&cpu_usage);
+
+        thread::spawn(move || {
+            let mut system = System::new_all();
+            loop {
+                system.refresh_cpu();
+                thread::sleep(Duration::from_millis(50));
+
+                let mut total_cpu_usage = 0.0;
+                for processor in system.processors() {
+                    total_cpu_usage += processor.cpu_usage();
+                }
+                total_cpu_usage /= system.processors().len() as f32;
+
+                let mut cpu_usage_lock = cpu_usage_clone.lock().unwrap();
+                *cpu_usage_lock = total_cpu_usage as u32;
+            }
+        });
+
+        Self { cpu_usage }
+    }
+}
+
 #[tonic::async_trait]
 impl ResourceUtilization for MyResourceUtilization {
     type SendStream = Pin<Box<dyn Stream<Item = Result<ResourceUtilizationResponse, Status>> + Send + Sync + 'static>>;
     
-    async fn send(&self, request: Request<ResourceUtilizationRequest>) -> Result<Response<Self::SendStream>, Status> {
-        let mut system = System::new_all();
-        let mut resource_utilization_values = Vec::new();
+    async fn send(&self, _request: Request<ResourceUtilizationRequest>) -> Result<Response<Self::SendStream>, Status> {
+        let cpu_usage_clone = Arc::clone(&self.cpu_usage);
 
-        // let mut rng = StdRng::from_entropy();
         let output_stream = repeat_with(move || {
-            resource_utilization_values.clear();
-            system.refresh_cpu();
-            thread::sleep(Duration::from_secs(1));
-
-            for (_core, processor) in system.processors().iter().enumerate() {
-                resource_utilization_values.push(processor.cpu_usage());
-                print!("{} ", processor.cpu_usage());
-            }
-            
-            let sum: f32 = resource_utilization_values.iter().sum();
-            let total_cpu_usage = (sum / resource_utilization_values.len() as f32) as u32;
-            Ok(ResourceUtilizationResponse { cpu_resource: total_cpu_usage.clone() })
+            let cpu_usage_lock = cpu_usage_clone.lock().unwrap();
+            let response = ResourceUtilizationResponse { cpu_resource: *cpu_usage_lock };
+            Ok(response)
         });
 
         Ok(Response::new(Box::pin(output_stream)))
@@ -50,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // defining address for our service
     let addr = "[::1]:50051".parse().unwrap();
     // creating a service
-    let resource_utilization: MyResourceUtilization = MyResourceUtilization::default();
+    let resource_utilization = MyResourceUtilization::new();
     println!("Server listening on {}", addr);
     // adding our service to our server.
     Server::builder()
