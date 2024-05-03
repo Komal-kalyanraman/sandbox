@@ -8,6 +8,8 @@ message ResourceUtilizationRequest {
 
 message ResourceUtilizationResponse {
   uint32 cpu_resource = 1;
+  uint32 memory_resource = 2;
+  string timestamp = 3;
 }
 
 service ResourceUtilization {
