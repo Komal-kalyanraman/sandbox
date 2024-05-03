@@ -1,11 +1,11 @@
-pub mod hello {
-    tonic::include_proto!("hello");
+pub mod resource_utilization {
+    tonic::include_proto!("resource_utilization");
 }
 
-use hello::say_client::SayClient;
-use hello::SayRequest;
+use resource_utilization::say_client::SayClient;
+use resource_utilization::ResourceUtiliazationRequest;
 use tonic::Streaming;
-use hello::SayResponse;
+use resource_utilization::ResourceUtiliazationResponse;
 use tonic::Status;
 
 #[tokio::main]
@@ -18,12 +18,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = SayClient::new(channel);
     // creating a new Request
     let request = tonic::Request::new(
-        SayRequest {
-            name:String::from("anshul")
+        ResourceUtiliazationRequest {
         },
     );
     // sending request and waiting for response
-    let mut response_stream: Streaming<SayResponse> = client.send(request).await?.into_inner();
+    let mut response_stream: Streaming<ResourceUtiliazationResponse> = client.send(request).await?.into_inner();
 
     // Loop to continuously print incoming messages
     while let Some(response) = response_stream.message().await? {

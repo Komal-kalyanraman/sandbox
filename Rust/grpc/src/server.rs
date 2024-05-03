@@ -1,10 +1,10 @@
-pub mod hello {
-    tonic::include_proto!("hello");
+pub mod resource_utilization {
+    tonic::include_proto!("resource_utilization");
 }
 
 use tonic::{transport::Server, Request, Response, Status};
-use crate::hello::say_server::{Say, SayServer};
-use crate::hello::{SayRequest, SayResponse};
+use resource_utilization::say_server::{Say, SayServer};
+use resource_utilization::{ResourceUtiliazationRequest, ResourceUtiliazationResponse};
 use futures::stream::Stream;
 use std::pin::Pin;
 use futures::stream::repeat_with;
@@ -19,14 +19,14 @@ pub struct MySay {}
 // implementing rpc for service defined in .proto
 #[tonic::async_trait]
 impl Say for MySay {
-    type SendStream = Pin<Box<dyn Stream<Item = Result<SayResponse, Status>> + Send + Sync + 'static>>;
+    type SendStream = Pin<Box<dyn Stream<Item = Result<ResourceUtiliazationResponse, Status>> + Send + Sync + 'static>>;
 
-    async fn send(&self, request: Request<SayRequest>) -> Result<Response<Self::SendStream>, Status> {
+    async fn send(&self, request: Request<ResourceUtiliazationRequest>) -> Result<Response<Self::SendStream>, Status> {
         let mut rng = StdRng::from_entropy();
         let output_stream = repeat_with(move || {
             let random_number: u32 = rng.gen();
-            let message = format!("hello {}, random number: {}", request.get_ref().name, random_number);
-            Ok(SayResponse { message: message.clone() })
+            let message = format!("random number: {}", random_number);
+            Ok(ResourceUtiliazationResponse { message: message.clone() })
         });
 
         Ok(Response::new(Box::pin(output_stream)))

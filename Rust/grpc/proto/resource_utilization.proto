@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package resource_utilization;
+
+message ResourceUtiliazationRequest {
+  // string name = 1;
+}
+
+message ResourceUtiliazationResponse {
+  string message = 1;
+}
+
+service Say {
+  rpc Send(ResourceUtiliazationRequest) returns (stream ResourceUtiliazationResponse);
+}
