@@ -2,10 +2,10 @@ pub mod resource_utilization {
     tonic::include_proto!("resource_utilization");
 }
 
-use resource_utilization::say_client::SayClient;
-use resource_utilization::ResourceUtiliazationRequest;
+use resource_utilization::resource_utilization_client::ResourceUtilizationClient;
+use resource_utilization::ResourceUtilizationRequest;
 use tonic::Streaming;
-use resource_utilization::ResourceUtiliazationResponse;
+use resource_utilization::ResourceUtilizationResponse;
 use tonic::Status;
 
 #[tokio::main]
@@ -15,14 +15,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .connect()
         .await?;
     // creating gRPC client from channel
-    let mut client = SayClient::new(channel);
+    let mut client = ResourceUtilizationClient::new(channel);
     // creating a new Request
     let request = tonic::Request::new(
-        ResourceUtiliazationRequest {
+        ResourceUtilizationRequest {
         },
     );
     // sending request and waiting for response
-    let mut response_stream: Streaming<ResourceUtiliazationResponse> = client.send(request).await?.into_inner();
+    let mut response_stream: Streaming<ResourceUtilizationResponse> = client.send(request).await?.into_inner();
 
     // Loop to continuously print incoming messages
     while let Some(response) = response_stream.message().await? {

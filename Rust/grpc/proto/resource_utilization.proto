@@ -2,14 +2,14 @@ syntax = "proto3";
 
 package resource_utilization;
 
-message ResourceUtiliazationRequest {
-  // string name = 1;
+message ResourceUtilizationRequest {
+
 }
 
-message ResourceUtiliazationResponse {
-  string message = 1;
+message ResourceUtilizationResponse {
+  uint32 cpu_resource = 1;
 }
 
-service Say {
-  rpc Send(ResourceUtiliazationRequest) returns (stream ResourceUtiliazationResponse);
+service ResourceUtilization {
+  rpc Send(ResourceUtilizationRequest) returns (stream ResourceUtilizationResponse);
 }
