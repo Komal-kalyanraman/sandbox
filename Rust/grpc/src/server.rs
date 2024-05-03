@@ -11,7 +11,7 @@ use resource_utilization::{ResourceUtilizationRequest, ResourceUtilizationRespon
 use futures::stream::Stream;
 use std::pin::Pin;
 use sysinfo::{ProcessorExt, System, SystemExt};
-use futures::stream::repeat_with;
+use futures::stream::StreamExt;
 
 #[derive(Default)]
 pub struct MyResourceUtilization {
@@ -51,11 +51,12 @@ impl ResourceUtilization for MyResourceUtilization {
     async fn send(&self, _request: Request<ResourceUtilizationRequest>) -> Result<Response<Self::SendStream>, Status> {
         let cpu_usage_clone = Arc::clone(&self.cpu_usage);
 
-        let output_stream = repeat_with(move || {
-            let cpu_usage_lock = cpu_usage_clone.lock().unwrap();
-            let response = ResourceUtilizationResponse { cpu_resource: *cpu_usage_lock };
-            Ok(response)
-        });
+        let output_stream = tokio::time::interval(Duration::from_millis(50))
+            .map(move |_| {
+                let cpu_usage_lock = cpu_usage_clone.lock().unwrap();
+                let response = ResourceUtilizationResponse { cpu_resource: *cpu_usage_lock };
+                Ok(response)
+            });
 
         Ok(Response::new(Box::pin(output_stream)))
     }
