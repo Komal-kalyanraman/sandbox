@@ -1,0 +1,16 @@
+{
+  "name": "proto_based_ui",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "google-protobuf": "^3.21.2",
+    "protobufjs": "^7.2.6"
+  }
+}
