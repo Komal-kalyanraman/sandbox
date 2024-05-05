@@ -60,14 +60,15 @@ sudo mv protoc-VERSION-SYSTEM/include/* /usr/local/include/
 
 ```bash
 cd ../proto
-protoc --python_out=. --js_out=import_style=commonjs,binary:. message.proto
+protoc --python_out=. message.proto
 ```
 
 6. Install the `grpc-tools` package and generate the gRPC stubs:
 
 ```bash
 npm install -g grpc-tools
-grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./ --grpc_out=./ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` message.proto
+grpc_tools_node_protoc --js_out=import_style=co
+mmonjs,binary:. --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` message.proto
 ```
 
 ## Running the Application
