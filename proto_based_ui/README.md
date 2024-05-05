@@ -1,21 +1,23 @@
+```markdown
 # Project Title
 
 This project is a simple client-server application using Protocol Buffers (protobuf) for data serialization. The server is implemented in Python and the client in JavaScript.
 
 ## Project Structure
-
 ```
+
 .
 ├── client
-│   ├── client.js
-│   └── package.json
+│ ├── client.js
+│ └── package.json
 ├── proto
-│   ├── message.proto
-│   ├── message_pb.js
-│   └── message_pb2.py
+│ ├── message.proto
+│ ├── message_pb.js
+│ └── message_pb2.py
 └── server
-    └── server.py
-```
+└── server.py
+
+````
 
 - `client/client.js`: This is the main JavaScript client file. It loads the protobuf message definition, fetches a message from the server, deserializes it, and logs it to the console.
 - `proto/message.proto`: This is the protobuf message definition. It defines a `MyMessage` type with `name`, `id`, and `email` fields.
@@ -29,7 +31,7 @@ This project is a simple client-server application using Protocol Buffers (proto
 ```bash
 git clone <repository-url>
 cd <repository-directory>
-```
+````
 
 2. Install the Python dependencies:
 
@@ -44,11 +46,28 @@ cd client
 npm install protobufjs google-protobuf
 ```
 
-4. Generate the protobuf files:
+4. Install `protoc`:
+
+```bash
+# Replace VERSION and SYSTEM with the appropriate values for your system
+wget https://github.com/protocolbuffers/protobuf/releases/download/vVERSION/protoc-VERSION-SYSTEM.zip
+unzip protoc-VERSION-SYSTEM.zip -d protoc-VERSION-SYSTEM
+sudo mv protoc-VERSION-SYSTEM/bin/protoc /usr/local/bin/
+sudo mv protoc-VERSION-SYSTEM/include/* /usr/local/include/
+```
+
+5. Generate the protobuf files:
 
 ```bash
 cd ../proto
 protoc --python_out=. --js_out=import_style=commonjs,binary:. message.proto
+```
+
+6. Install the `grpc-tools` package and generate the gRPC stubs:
+
+```bash
+npm install -g grpc-tools
+grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./ --grpc_out=./ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` message.proto
 ```
 
 ## Running the Application
@@ -84,7 +103,3 @@ The `server.py` file serves a serialized `MyMessage` at `http://localhost:5000`.
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
