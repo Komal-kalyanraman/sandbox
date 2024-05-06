@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Client</title>
+    <script src="client.js"></script>
+  </head>
+  <body>
+    <button id="getMessageButton">Get Message</button>
+    <p id="name"></p>
+    <p id="id"></p>
+    <p id="email"></p>
+    <script>
+      document
+        .getElementById("getMessageButton")
+        .addEventListener("click", function () {
+          fetch("http://localhost:5000/message")
+            .then((response) => response.json())
+            .then((data) => {
+              // Use the message
+              document.getElementById("name").textContent =
+                "Name: " + data.name;
+              document.getElementById("id").textContent = "ID: " + data.id;
+              document.getElementById("email").textContent =
+                "Email: " + data.email;
+            });
+        });
+    </script>
+  </body>
+</html>

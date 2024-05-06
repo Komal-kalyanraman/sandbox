@@ -8,16 +8,18 @@ protobuf.load("../proto/message.proto", function (err, root) {
   // Obtain the message type
   const MyMessage = root.lookupType("MyMessage");
 
-  // Fetch the message from the server
-  fetch("http://localhost:5000")
-    .then((response) => response.arrayBuffer())
-    .then((buffer) => {
-      // Deserialize the message from bytes
-      const message = MyMessage.decode(new Uint8Array(buffer));
+  // Define the fetchMessage function
+  function fetchMessage() {
+    fetch("http://localhost:5000/message")
+      .then((response) => response.json())
+      .then((data) => {
+        // Use the message
+        console.log(`Name: ${data.name}`);
+        console.log(`ID: ${data.id}`);
+        console.log(`Email: ${data.email}`);
+      });
+  }
 
-      // Use the message
-      console.log(`Name: ${message.name}`);
-      console.log(`ID: ${message.id}`);
-      console.log(`Email: ${message.email[0]}`);
-    });
+  // Call the fetchMessage function
+  fetchMessage();
 });
