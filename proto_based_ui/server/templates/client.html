@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Client</title>
-    <script src="client.js"></script>
+    <script src="https://cdn.rawgit.com/dcodeIO/protobuf.js/6.X.X/dist/protobuf.min.js"></script>
   </head>
   <body>
     <button id="getMessageButton">Get Message</button>
@@ -10,20 +10,41 @@
     <p id="id"></p>
     <p id="email"></p>
     <script>
-      document
-        .getElementById("getMessageButton")
-        .addEventListener("click", function () {
+      protobuf.load("/proto/message.proto", function (err, root) {
+        if (err) throw err;
+
+        // Obtain the message type
+        const MyMessage = root.lookupType("MyMessage");
+
+        // Define the fetchMessage function
+        function fetchMessage() {
           fetch("http://localhost:5000/message")
-            .then((response) => response.json())
-            .then((data) => {
+            .then((response) => response.arrayBuffer())
+            .then((buffer) => {
+              // Decode the protobuf message
+              const message = MyMessage.decode(new Uint8Array(buffer));
+
+              // Convert the message to a JavaScript object
+              const object = MyMessage.toObject(message, {
+                longs: String,
+                enums: String,
+                bytes: String,
+              });
+
               // Use the message
               document.getElementById("name").textContent =
-                "Name: " + data.name;
-              document.getElementById("id").textContent = "ID: " + data.id;
+                "Name: " + object.name;
+              document.getElementById("id").textContent = "ID: " + object.id;
               document.getElementById("email").textContent =
-                "Email: " + data.email;
+                "Email: " + object.email;
             });
-        });
+        }
+
+        // Add an event listener to the getMessageButton
+        document
+          .getElementById("getMessageButton")
+          .addEventListener("click", fetchMessage);
+      });
     </script>
   </body>
 </html>
