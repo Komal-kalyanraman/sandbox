@@ -8704,6 +8704,22 @@
         "type": "attribute",
         "unit": "mm",
         "uuid": "b4aabe144e3259adb1459a2e25fec9bd"
+      },
+      "Cpu": {
+        "datatype": "uint8",
+        "default": 0,
+        "description": "HPC CPU utilization",
+        "type": "sensor",
+        "unit": "percent",
+        "uuid": "2041809fdc404c01aea398806544e009"
+      },
+      "Memory": {
+        "datatype": "uint8",
+        "default": 0,
+        "description": "HPC Memory utilization",
+        "type": "sensor",
+        "unit": "percent",
+        "uuid": "eb05d64021c24786971723425f682583"
       }
     },
     "description": "High-level vehicle data.",
