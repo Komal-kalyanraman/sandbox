@@ -22,7 +22,7 @@ def calculate_memory_stress_bytes(percentage_increment):
 # Duration for each stress test
 sleep_duration = 2
 percentage_increment = 1
-test_duration = 60
+test_duration = 5
 
 # Loop from 1% to 20% incrementally for both CPU and memory
 for _ in range(1, 21):
