@@ -6,28 +6,70 @@ function App() {
   const [message, setMessage] = useState("");
   const [sliderValue, setSliderValue] = useState(0);
   const videoRef = useRef(null); // Ref for the video element
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    // Function to get access to the camera and stream the video
-    const getVideo = () => {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          let video = videoRef.current;
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        let video = videoRef.current;
+        if (video) {
           video.srcObject = stream;
-          // Use the promise returned by play() to catch any errors
-          video.play().catch((err) => {
-            console.error("Play was interrupted:", err);
-            // Handle the interruption or log the error as needed
-          });
-        })
-        .catch((err) => {
-          console.error("error:", err);
-        });
-    };
+          video.play();
+        }
+      })
+      .catch((err) => {
+        console.error("Error accessing the webcam", err);
+      });
 
-    getVideo();
+    // Set up an interval to send the frame to the backend every 5 seconds
+    const intervalId = setInterval(() => {
+      sendFrameToBackend();
+    }, 5000);
+
+    // Cleanup function to stop video stream and clear the interval
+    return () => {
+      const video = videoRef.current;
+      if (video && video.srcObject) {
+        video.srcObject.getTracks().forEach((track) => track.stop());
+      }
+      clearInterval(intervalId);
+    };
   }, []); // Empty array to run the effect only once after the initial render
+
+  const captureFrame = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (video && canvas) {
+      const context = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // Convert the canvas to a JPEG image
+      const imageDataUrl = canvas.toDataURL("image/jpeg");
+      return imageDataUrl; // This is a base64-encoded JPEG image
+    }
+  };
+
+  const sendFrameToBackend = () => {
+    const imageDataUrl = captureFrame();
+    if (imageDataUrl) {
+      fetch("http://localhost:3001/api/process_frame", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image: imageDataUrl }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+  };
 
   const handleClick = () => {
     fetch("http://localhost:3001/api/time")
@@ -81,6 +123,7 @@ function App() {
       <p>Vehicle Speed km/h: {sliderValue}</p>{" "}
       {/* Displaying the slider value */}
       <video autoPlay playsInline ref={videoRef}></video>
+      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </div>
   );
 }
