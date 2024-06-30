@@ -1,10 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
   const [message, setMessage] = useState("");
   const [sliderValue, setSliderValue] = useState(0);
+  const videoRef = useRef(null); // Ref for the video element
+
+  useEffect(() => {
+    // Function to get access to the camera and stream the video
+    const getVideo = () => {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          let video = videoRef.current;
+          video.srcObject = stream;
+          // Use the promise returned by play() to catch any errors
+          video.play().catch((err) => {
+            console.error("Play was interrupted:", err);
+            // Handle the interruption or log the error as needed
+          });
+        })
+        .catch((err) => {
+          console.error("error:", err);
+        });
+    };
+
+    getVideo();
+  }, []); // Empty array to run the effect only once after the initial render
 
   const handleClick = () => {
     fetch("http://localhost:3001/api/time")
@@ -55,7 +78,9 @@ function App() {
         value={sliderValue}
         onChange={handleSliderChange}
       />
-      <p>Slider Value: {sliderValue}</p> {/* Displaying the slider value */}
+      <p>Vehicle Speed km/h: {sliderValue}</p>{" "}
+      {/* Displaying the slider value */}
+      <video autoPlay playsInline ref={videoRef}></video>
     </div>
   );
 }
