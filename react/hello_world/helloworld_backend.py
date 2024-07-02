@@ -41,5 +41,13 @@ def process_frame():
     else:
         return jsonify(message="No image data received"), 400
 
+@app.route('/api/lock', methods=['POST'])
+def handle_toggle():
+    toggle_state = request.json.get('isToggled')  # Extract the toggle state from the request body
+    print(f"Received toggle state: {toggle_state}")  # For demonstration, print the state
+    # Here, you can add code to process the toggle state, such as updating a database or triggering other actions
+    
+    return jsonify(message="Toggle state received", isToggled=toggle_state)
+
 if __name__ == '__main__':
     app.run( host="0.0.0.0", port=3001, debug=True)

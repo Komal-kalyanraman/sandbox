@@ -5,6 +5,7 @@ import "./App.css";
 function App() {
   const [message, setMessage] = useState("");
   const [sliderValue, setSliderValue] = useState(0);
+  const [isToggled, setIsToggled] = useState(false);
   const videoRef = useRef(null); // Ref for the video element
   const canvasRef = useRef(null);
 
@@ -42,6 +43,30 @@ function App() {
       clearInterval(intervalId);
     };
   }, []); // Empty array to run the effect only once after the initial render
+
+  const toggleButton = () => {
+    const newToggleState = !isToggled;
+    setIsToggled(newToggleState);
+
+    // Prepare the data to be sent
+    const data = { isToggled: newToggleState };
+
+    // Use fetch API to send the data to your backend
+    fetch("http://localhost:3001/api/lock", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
 
   const captureFrame = () => {
     const video = videoRef.current;
@@ -126,6 +151,7 @@ function App() {
         value={sliderValue}
         onChange={handleSliderChange}
       />
+      <button onClick={toggleButton}>{isToggled ? "ON" : "OFF"}</button>
       <p>Vehicle Speed km/h: {sliderValue}</p>{" "}
       {/* Displaying the slider value */}
       <video autoPlay playsInline ref={videoRef}></video>
