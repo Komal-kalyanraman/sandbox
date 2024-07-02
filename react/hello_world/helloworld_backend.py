@@ -4,6 +4,8 @@ import datetime
 import base64
 from io import BytesIO
 from PIL import Image
+from kuksa_client.grpc import VSSClient
+from kuksa_client.grpc import Datapoint
 
 app = Flask(__name__)
 CORS(app)
@@ -18,6 +20,10 @@ def currentTime():
 def handle_slider():
     slider_value = request.json.get('value')  # Get the slider value from the request body
     print(f"Received slider value: {slider_value}")  # For demonstration, print the value
+    with VSSClient('127.0.0.1', 55555) as client:
+        client.set_current_values({
+        'Vehicle.Cpu': Datapoint(slider_value),
+        })
     return jsonify(message="Slider value received", value=slider_value)
 
 @app.route('/api/process_frame', methods=['POST'])
