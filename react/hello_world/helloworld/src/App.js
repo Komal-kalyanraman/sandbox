@@ -15,7 +15,13 @@ function App() {
         let video = videoRef.current;
         if (video) {
           video.srcObject = stream;
-          video.play();
+          // Listen for the loadedmetadata event to know when the video is ready
+          video.onloadedmetadata = () => {
+            // Once the video is ready, call play()
+            video.play().catch((err) => {
+              console.error("Error attempting to play the video", err);
+            });
+          };
         }
       })
       .catch((err) => {
