@@ -20,7 +20,7 @@ def currentTime():
 @app.route('/api/slider', methods=['POST'])
 def handle_slider():
     slider_value = request.json.get('value')  # Get the slider value from the request body
-    print(f"Received slider value: {slider_value}")  # For demonstration, print the value
+    # sensor
     with VSSClient('127.0.0.1', 55555) as client:
         client.set_current_values({
         'Vehicle.AverageSpeed': Datapoint(slider_value),
@@ -43,7 +43,7 @@ def process_frame():
             flag = False
         else:
             flag = True
-        
+        # sensor
         with VSSClient('127.0.0.1', 55555) as client:
             client.set_current_values({
             'Vehicle.ADAS.DMS.IsWarning': Datapoint(flag),
@@ -59,7 +59,7 @@ def handle_toggle():
         flag = False
     else:
         flag = True
-
+    # actuator
     with VSSClient('127.0.0.1', 55555) as client:
         client.set_current_values({
         'Vehicle.Cabin.Door.Row1.DriverSide.IsLocked': Datapoint(flag),

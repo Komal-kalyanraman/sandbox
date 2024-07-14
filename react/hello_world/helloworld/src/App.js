@@ -141,7 +141,6 @@ function App() {
     const newValue = event.target.value;
     setSliderValue(newValue);
     sendSliderValueToServer(newValue);
-    // setSliderValue(event.target.value);
   };
 
   return (
