@@ -8,6 +8,7 @@ function App() {
   const [isToggled, setIsToggled] = useState(false);
   const videoRef = useRef(null); // Ref for the video element
   const canvasRef = useRef(null);
+  const [indicatorColor, setIndicatorColor] = useState("red"); // Default color is red
 
   useEffect(() => {
     navigator.mediaDevices
@@ -95,6 +96,11 @@ function App() {
         .then((response) => response.json())
         .then((data) => {
           console.log("Success:", data);
+          if (data.message === "Person detected") {
+            setIndicatorColor("green");
+          } else {
+            setIndicatorColor("red");
+          }
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -140,8 +146,16 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={handleClick}> current time </button>
-      <input type="text" value={message} readOnly />{" "}
+      <div
+        style={{
+          width: "20px",
+          height: "20px",
+          backgroundColor: indicatorColor,
+          borderRadius: "50%",
+        }}
+      ></div>
+      {/* <button onClick={handleClick}> current time </button> */}
+      {/* <input type="text" value={message} readOnly />{" "} */}
       {/* <input type="text" value={message} readOnly /> */}
       {/* Slider input */}
       <input
@@ -151,7 +165,12 @@ function App() {
         value={sliderValue}
         onChange={handleSliderChange}
       />
-      <button onClick={toggleButton}>{isToggled ? "ON" : "OFF"}</button>
+      <button
+        onClick={toggleButton}
+        style={{ backgroundColor: isToggled ? "green" : "red" }}
+      >
+        {isToggled ? "UnLocked" : "Locked"}
+      </button>
       <p>Vehicle Speed km/h: {sliderValue}</p>{" "}
       {/* Displaying the slider value */}
       <video autoPlay playsInline ref={videoRef}></video>

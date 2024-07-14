@@ -6,6 +6,7 @@ from io import BytesIO
 from PIL import Image
 from kuksa_client.grpc import VSSClient
 from kuksa_client.grpc import Datapoint
+from driver_attention_monitor import process_image
 
 app = Flask(__name__)
 CORS(app)
@@ -37,7 +38,9 @@ def process_frame():
         image = Image.open(BytesIO(image_data))
         # Process the image here (e.g., save, analyze, etc.)
         image.save("received_frame.jpeg", "JPEG")  # Example: saving the image
-        return jsonify(message="Image processed successfully")
+        result = process_image("received_frame.jpeg")  # Example: processing the image
+        print(result)
+        return jsonify(message=result)
     else:
         return jsonify(message="No image data received"), 400
 
