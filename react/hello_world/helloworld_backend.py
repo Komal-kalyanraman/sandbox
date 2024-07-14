@@ -23,7 +23,7 @@ def handle_slider():
     print(f"Received slider value: {slider_value}")  # For demonstration, print the value
     with VSSClient('127.0.0.1', 55555) as client:
         client.set_current_values({
-        'Vehicle.Cpu': Datapoint(slider_value),
+        'Vehicle.AverageSpeed': Datapoint(slider_value),
         })
     return jsonify(message="Slider value received", value=slider_value)
 
@@ -39,7 +39,15 @@ def process_frame():
         # Process the image here (e.g., save, analyze, etc.)
         image.save("received_frame.jpeg", "JPEG")  # Example: saving the image
         result = process_image("received_frame.jpeg")  # Example: processing the image
-        print(result)
+        if result == "Person detected":
+            flag = False
+        else:
+            flag = True
+        
+        with VSSClient('127.0.0.1', 55555) as client:
+            client.set_current_values({
+            'Vehicle.ADAS.DMS.IsWarning': Datapoint(flag),
+            })
         return jsonify(message=result)
     else:
         return jsonify(message="No image data received"), 400
@@ -47,9 +55,15 @@ def process_frame():
 @app.route('/api/lock', methods=['POST'])
 def handle_toggle():
     toggle_state = request.json.get('isToggled')  # Extract the toggle state from the request body
-    print(f"Received toggle state: {toggle_state}")  # For demonstration, print the state
-    # Here, you can add code to process the toggle state, such as updating a database or triggering other actions
-    
+    if toggle_state == True:
+        flag = False
+    else:
+        flag = True
+
+    with VSSClient('127.0.0.1', 55555) as client:
+        client.set_current_values({
+        'Vehicle.Cabin.Door.Row1.DriverSide.IsLocked': Datapoint(flag),
+        })
     return jsonify(message="Toggle state received", isToggled=toggle_state)
 
 if __name__ == '__main__':
