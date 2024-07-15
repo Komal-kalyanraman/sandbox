@@ -253,6 +253,23 @@ function App() {
         ref={videoRef}
         style={{ marginTop: "20px", marginLeft: "20px" }}
       ></video>
+      <video
+        autoPlay
+        playsInline
+        controls
+        // style={{ marginTop: "20px", marginLeft: "20px" }} // Adjust styling as needed
+        // // src={`${process.env.PUBLIC_URL}/traffic.mp4`}
+        // src="/traffic.mp4" // Replace with the actual path to your video
+        muted // Added for debugging, helps with autoplay in some browsers
+        loop // Optional, keeps the video playing in a loop
+        style={{
+          width: "640px",
+          height: "480px",
+          marginTop: "20px",
+          marginLeft: "20px",
+        }} // Adjust styling as needed
+        src="traffic.mp4"
+      ></video>
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </div>
   );
