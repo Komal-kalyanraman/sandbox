@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
+import { styled } from "@mui/material/styles";
 import logo from "./logo.svg";
 import "./App.css";
 
@@ -143,35 +146,52 @@ function App() {
     sendSliderValueToServer(newValue);
   };
 
+  const ComponentPaper = styled(Paper)(({ theme }) => ({
+    width: 120,
+    height: 120,
+    padding: theme.spacing(2),
+    ...theme.typography.body2,
+    textAlign: "center",
+  }));
+
   return (
     <div className="App">
-      <div
-        style={{
-          width: "20px",
-          height: "20px",
-          backgroundColor: indicatorColor,
-          borderRadius: "50%",
-        }}
-      ></div>
-      {/* <button onClick={handleClick}> current time </button> */}
-      {/* <input type="text" value={message} readOnly />{" "} */}
-      {/* <input type="text" value={message} readOnly /> */}
-      {/* Slider input */}
-      <input
-        type="range"
-        min="0"
-        max="250"
-        value={sliderValue}
-        onChange={handleSliderChange}
-      />
-      <button
-        onClick={toggleButton}
-        style={{ backgroundColor: isToggled ? "green" : "red" }}
-      >
-        {isToggled ? "UnLocked" : "Locked"}
-      </button>
-      <p>Vehicle Speed km/h: {sliderValue}</p>{" "}
-      {/* Displaying the slider value */}
+      <Stack direction="row" spacing={2}>
+        <ComponentPaper>
+          <input
+            type="range"
+            min="0"
+            max="250"
+            value={sliderValue}
+            onChange={handleSliderChange}
+          />
+          <p>Vehicle Speed km/h: {sliderValue}</p>{" "}
+        </ComponentPaper>
+
+        <ComponentPaper>
+          <button
+            onClick={toggleButton}
+            style={{ backgroundColor: isToggled ? "green" : "red" }}
+          >
+            {isToggled ? "UnLocked" : "Locked"}
+          </button>
+        </ComponentPaper>
+
+        <ComponentPaper>
+          <div
+            style={{
+              width: "20px",
+              height: "20px",
+              backgroundColor: indicatorColor,
+              borderRadius: "50%",
+            }}
+          ></div>
+        </ComponentPaper>
+        {/* <ComponentPaper>
+          <video autoPlay playsInline ref={videoRef}></video>
+          <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+        </ComponentPaper> */}
+      </Stack>
       <video autoPlay playsInline ref={videoRef}></video>
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </div>
