@@ -36,7 +36,7 @@ function App() {
     // Set up an interval to send the frame to the backend every 5 seconds
     const intervalId = setInterval(() => {
       sendFrameToBackend();
-    }, 5000);
+    }, 1000);
 
     // Cleanup function to stop video stream and clear the interval
     return () => {
@@ -147,8 +147,8 @@ function App() {
   };
 
   const ComponentPaper = styled(Paper)(({ theme }) => ({
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 240,
     padding: theme.spacing(2),
     ...theme.typography.body2,
     textAlign: "center",
@@ -158,41 +158,101 @@ function App() {
     <div className="App">
       <Stack direction="row" spacing={2}>
         <ComponentPaper>
+          <img
+            src="speedometer.png"
+            alt="Descriptive Text"
+            style={{
+              transform: "scale(0.95)", // Scales down the image to 75% of its original size
+              marginTop: "15px",
+            }}
+          />
+          <p style={{ fontSize: "16px" }}>Vehicle Speed km/h: {sliderValue}</p>
+          {/* <p>Vehicle Speed km/h: {sliderValue}</p>{" "} */}
           <input
             type="range"
             min="0"
             max="250"
             value={sliderValue}
             onChange={handleSliderChange}
+            style={{
+              width: "200px", // Increase the slider's width
+              height: "25px", // Increase the slider's height/thickness
+              margin: "10px 0", // Optional: Add margin for better positioning
+            }}
           />
-          <p>Vehicle Speed km/h: {sliderValue}</p>{" "}
-        </ComponentPaper>
-
-        <ComponentPaper>
-          <button
-            onClick={toggleButton}
-            style={{ backgroundColor: isToggled ? "green" : "red" }}
-          >
-            {isToggled ? "UnLocked" : "Locked"}
-          </button>
         </ComponentPaper>
 
         <ComponentPaper>
           <div
             style={{
-              width: "20px",
-              height: "20px",
-              backgroundColor: indicatorColor,
-              borderRadius: "50%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
-          ></div>
+          >
+            <img
+              src="carlock.png"
+              alt="Descriptive Text"
+              style={{
+                transform: "scale(0.95)", // Scales down the image to 75% of its original size
+                marginTop: "10px",
+              }}
+            />
+            <button
+              onClick={toggleButton}
+              style={{
+                backgroundColor: isToggled ? "red" : "green",
+                marginTop: "60px",
+                width: "100px",
+                height: "40px",
+                fontSize: "20px",
+              }}
+            >
+              {isToggled ? "UnLocked" : "Locked"}
+            </button>
+          </div>
+        </ComponentPaper>
+
+        <ComponentPaper>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <img
+              src="dms.png"
+              alt="Descriptive Text"
+              style={{
+                transform: "scale(0.7)", // Scales down the image to 75% of its original size
+                marginBottom: "0px", // Add some space between the image and the indicator
+                marginTop: "0px", // Add some space between the image and the indicator
+              }}
+            />
+            <p style={{ fontSize: "18px", margin: "0" }}>DMS warning</p>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                backgroundColor: indicatorColor,
+                borderRadius: "50%",
+                // marginTop: "15px", // Add some space between the image and the indicator
+              }}
+            ></div>
+          </div>
         </ComponentPaper>
         {/* <ComponentPaper>
           <video autoPlay playsInline ref={videoRef}></video>
           <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
         </ComponentPaper> */}
       </Stack>
-      <video autoPlay playsInline ref={videoRef}></video>
+      <video
+        autoPlay
+        playsInline
+        ref={videoRef}
+        style={{ marginTop: "20px", marginLeft: "20px" }}
+      ></video>
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
     </div>
   );
